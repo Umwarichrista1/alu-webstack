@@ -1,0 +1,29 @@
+global
+    log /dev/log local0
+    maxconn 2048
+    user haproxy
+    group haproxy
+    daemon
+
+defaults
+    log global
+    mode http
+    option httplog
+    option dontlognull
+    timeout connect 5s
+    timeout client 30s
+    timeout server 30s
+
+frontend http_front
+    bind *:80
+    default_backend app_servers
+
+backend app_servers
+    balance roundrobin
+    option httpchk GET /
+    server web-01 13.40.9.218:80 check
+    server web-02 16.60.164.228:80 check
+
+frontend https_front
+    bind *:443 ssl crt /etc/haproxy/certs/www.christaweb.tech.pem
+    default_backend app_servers
